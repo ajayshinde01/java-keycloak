@@ -100,7 +100,30 @@ public class EmpController {
 
 		AccessTokenResponse response = authzClient.obtainAccessToken(userDTO.getEmail(), userDTO.getPassword());
 
+// Find all files matching "data<number>.csv".
+		List<String> files = new ArrayList<String>();
+		File dir = new File(path);
+		for (File file : dir.listFiles()) {
+			if (file.isFile() && file.getName().matches("data\\d+\\.csv")) {
+				files.add(file.getAbsolutePath());
+			}
+		}
+		List<String> paths = FileUtils.findFiles(path, "data\\d+\\.csv");
+		// Concatenate all the files into one
+		StringBuilder sb = new StringBuilder();
+		for (File file : files) {
+			try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+				String line = br.readLine();
+				while (line != null) {
+					sb.append(line);
+					line = br.readLine();
+				}
+			}
+		}
+
+		
 		return ResponseEntity.ok(response);
+		
 	}
 
 	@PostMapping("/create")
